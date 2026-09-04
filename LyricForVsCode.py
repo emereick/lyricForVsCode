@@ -8,9 +8,8 @@ from spotipy.oauth2 import SpotifyOAuth
 from concurrent.futures import ThreadPoolExecutor
 
 # --- PENGATURAN ---
-# --- Buat Dashboard terlebih dahulu di spotify for developer --- 
-CLIENT_ID = 'Client_id spotify for developer'
-CLIENT_SECRET = 'Secret_id spotify for developer'
+CLIENT_ID = '3a4b352b67354c048d0eefa10b617951'
+CLIENT_SECRET = 'f95129e7bf5e435ea7bf2a623ecc2550'
 REDIRECT_URI = 'https://google.com/'
 SCOPE = 'user-read-currently-playing'
 
@@ -95,6 +94,7 @@ def dapatkan_indeks_lirik_aktif(lirik_data, waktu_sekarang):
 def jalankan_live_lirik():
     sp = hubungkan_ke_spotify()
     id_lagu_terakhir = None
+    lirik_data = [] # Inisialisasi dari awal agar tidak UnboundLocalError
     
     bersihkan_terminal()
     print("=== Sistem Live Lirik Spotify Aktif ===")
@@ -115,8 +115,11 @@ def jalankan_live_lirik():
         judul_lagu = track['item']['name']
         artis = track['item']['artists'][0]['name']
         
+        # Pemuatan Lirik Baru Saat Lagu Berganti
         if current_id != id_lagu_terakhir:
             id_lagu_terakhir = current_id
+            lirik_data = [] # Kosongkan lirik data saat lagu ganti
+            
             bersihkan_terminal()
             print(f"Memuat lirik untuk: {HIJAU}{judul_lagu}{RESET} oleh {artis}...")
             
@@ -124,8 +127,7 @@ def jalankan_live_lirik():
             
             if not lirik_mentah:
                 print(f"{ABU_ABU}Lirik tersinkronisasi tidak ditemukan. Menunggu lagu berikutnya...{RESET}")
-                time.sleep(5)
-                continue
+                continue # Lompat ke pengulangan berikutnya
 
             waktu_list = []
             lirik_mentah_list = []
@@ -152,6 +154,12 @@ def jalankan_live_lirik():
 
             lirik_data = list(zip(waktu_list, lirik_mentah_list, lirik_indo_list))
 
+        # Jika lagu saat ini tidak memiliki lirik, jangan coba menyinkronkan
+        if not lirik_data:
+            time.sleep(3)
+            continue 
+
+        # Synchronize waktu lagu awal
         try:
             track = sp.current_user_playing_track()
             progress_ms = track['progress_ms'] if track else 0
@@ -162,6 +170,7 @@ def jalankan_live_lirik():
         indeks_terakhir_tampil = -99
         waktu_cek_terakhir = time.time()
 
+        # Inner loop: Memutar animasi ketikan sinkron
         while True:
             waktu_sekarang = time.time() - waktu_mulai_lokal
             
