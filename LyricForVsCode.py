@@ -8,8 +8,9 @@ from spotipy.oauth2 import SpotifyOAuth
 from concurrent.futures import ThreadPoolExecutor
 
 # --- PENGATURAN ---
-CLIENT_ID = '3a4b352b67354c048d0eefa10b617951'
-CLIENT_SECRET = 'f95129e7bf5e435ea7bf2a623ecc2550'
+# --- Buat Dashboard terlebih dahulu di spotify for developer --- 
+CLIENT_ID = 'Client_id spotify for developer'
+CLIENT_SECRET = 'Secret_id spotify for developer'
 REDIRECT_URI = 'https://google.com/'
 SCOPE = 'user-read-currently-playing'
 
